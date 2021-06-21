@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JS + CSS Clock</title>
+</head>
+
+<body>
+    <div>
+        <canvas width="700" height="700"></canvas>
+    </div>
+
+    <style>
+        body {
+            background-color: #302c1d;
+            background-size: cover;
+            background-repeat: no-repeat;
+            align-items: center;
+        }
+
+        div {
+            width: 50rem;
+            height: auto;
+            text-align: center;
+            margin: auto;
+        }
+    </style>
+    <script>
+        var canvas = document.querySelector("canvas");
+        const can = canvas.getContext("2d");
+
+        // Default styling
+        var backgroundColor = '#100e04';
+        var firstColor = '#716844';
+        var secondColor = '#c0b28c';
+        var thridColor = '#DAD2BC';
+        var outerRingShadow = '#dbdbdb';
+        var innerRingsShadow = '#0a0a0a';
+        var clockSize = 200;
+        var clockCircleSpacing = 40;
+        var clockTop = 50;
+        var clockTextSize = clockCircleSpacing / 10
+
+
+        // Ur placering
+        const placeringY = canvas.height / 2;
+        const placeringX = canvas.width / 2;
+
+
+        // Udregner placering for punkterne af arc
+        function OffsetAndDegreeToRadius(point) {
+            var offset = -90 + point;
+            var radius = Math.PI / 180;
+            return offset * radius;
+        }
+
+        // Tilføjer ekstra 0 så der altid vil være 2 tal i minutter og sekunder
+        function ExtraNumber(str) {
+            var tempStr = str.toString();
+            if (tempStr.length < 2) str = 0 + tempStr;
+            return str;
+        }
+
+
+
+        function ClockWork() {
+            const now = new Date();
+            // Rydder Canvas
+            can.clearRect(0, 0, canvas.width, canvas.height);
+
+            can.shadowBlur = 20;
+            can.shadowColor = outerRingShadow;
+            can.fillStyle = backgroundColor;
+            can.beginPath();
+            // Midten
+            can.moveTo(placeringX, placeringY);
+            // Flytter til starten af cirklen
+            can.lineTo(placeringX, clockTop - 10);
+            // Laver en buet linje mellem to punkter, ved brug af arc (placering X, placering Y, Cirkel størrelse, start placering, slut placering )
+            can.arc(placeringX, placeringY, clockSize + 10, OffsetAndDegreeToRadius(0), OffsetAndDegreeToRadius(360));
+            // Flytter tilbage til midten - for at aflukke området så det kan farves
+            can.moveTo(placeringX, placeringY);
+            can.fill();
+
+
+            // Sekund viser
+            const sec = now.getSeconds();
+            const mili = now.getMilliseconds();
+
+            can.shadowBlur = 0;
+            can.shadowColor = innerRingsShadow;
+            can.fillStyle = firstColor;
+            can.beginPath();
+            can.moveTo(placeringX, placeringY);
+            can.lineTo(placeringX, clockTop);
+            can.arc(placeringX, placeringY, clockSize, OffsetAndDegreeToRadius(0), OffsetAndDegreeToRadius((((sec / 60) * 360) + (mili / 1000) * 6)));
+            can.moveTo(placeringX, placeringY);
+            can.fill();
+
+
+            // Minut viser
+            const min = now.getMinutes();
+
+            can.shadowBlur = clockCircleSpacing * 2;
+            can.fillStyle = secondColor;
+            can.beginPath();
+            can.moveTo(placeringX, placeringY);
+            can.lineTo(placeringX, clockTop + clockCircleSpacing);
+            can.arc(placeringX, placeringY, clockSize - clockCircleSpacing, OffsetAndDegreeToRadius(0), OffsetAndDegreeToRadius(((min / 60) * 360) + ((sec / 60) * 6)));
+            can.moveTo(placeringX, placeringY);
+            can.fill();
+
+
+            // Time viser
+            var hours = now.getHours();
+
+            if (hours > 12) hours -= 12;
+            can.fillStyle = thridColor;
+            can.beginPath();
+            can.moveTo(placeringX, placeringY);
+            can.lineTo(placeringX, clockTop + (clockCircleSpacing * 2));
+            can.arc(placeringX, placeringY, clockSize - (clockCircleSpacing * 2), OffsetAndDegreeToRadius(0), OffsetAndDegreeToRadius(((hours / 12) * 360) + ((min / 60) * 30)));
+            can.moveTo(placeringX, placeringY);
+            can.fill();
+
+            
+
+            // Digital ur
+            var textTime = hours + ":" + ExtraNumber(min) + ":" + ExtraNumber(sec);
+            can.fillStyle = '#ffffff';
+            can.font = `bold ${clockTextSize}em serif`;
+            can.shadowColor = innerRingsShadow;
+            can.shadowBlur = 7;
+            var textTimePlaceringX = placeringX - (can.measureText(textTime).width / 2);
+            var textVerticalAlignment = placeringY + (clockCircleSpacing / 2);
+            can.fillText(textTime, textTimePlaceringX,textVerticalAlignment );  
+            
+            
+            var date = now.getDate();
+            var month = now.getMonth();
+            var year = now.getFullYear();
+            var textDate =  date + "/" + month + "/" + year;
+            can.font = 'bold 1em serif';
+            var textDatePlaceringX = placeringX - (can.measureText(textDate).width/2);
+            //de +20 sørger for der er 1.25em mellemrum fra texten ovenfor
+            can.fillText(textDate, textDatePlaceringX, textVerticalAlignment + 20);
+        }
+
+        setInterval(ClockWork, 50);
+
+    </script>
+</body>
+
+</html>
