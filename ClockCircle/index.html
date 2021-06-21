@@ -73,7 +73,7 @@
             can.shadowColor = outerRingShadow;
             can.fillStyle = backgroundColor;
             can.beginPath();
-            // Midten
+            // Starter tegningen fra midten
             can.moveTo(placeringX, placeringY);
             // Flytter til starten af cirklen
             can.lineTo(placeringX, clockTop - 10);
@@ -83,8 +83,9 @@
             can.moveTo(placeringX, placeringY);
             can.fill();
 
-
-            // Sekund viser
+            // ---------------- Viserne og teksten er ikke seperate funktioner pga. problemer med canvas
+            
+            // Sekund viser  
             const sec = now.getSeconds();
             const mili = now.getMilliseconds();
 
@@ -143,7 +144,7 @@
             var textDate =  date + "/" + month + "/" + year;
             can.font = 'bold 1em serif';
             var textDatePlaceringX = placeringX - (can.measureText(textDate).width/2);
-            //de +20 sørger for der er 1.25em mellemrum fra texten ovenfor
+            // De +20 sørger for der er 1.25em mellemrum fra teksten ovenfor
             can.fillText(textDate, textDatePlaceringX, textVerticalAlignment + 20);
         }
 
